@@ -20,7 +20,7 @@ from registration.views import register
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('main.urls')),
+    path('habits/', include('main.urls')),
     path('register/', register, name='register'),
     path('', include('django.contrib.auth.urls')),
 ]

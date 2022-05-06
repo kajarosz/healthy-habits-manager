@@ -11,7 +11,15 @@
     <title>{% block title %}{% endblock %}</title>
   </head>
   <body>
-    {% block content %}{% endblock %}
+    {% if user.is_authenticated %}
+    <p>Logout <a href="/logout">here!</a></p>
+    {% block auth_content %}{% endblock %}
+    {% else %}
+    {% block not_auth_content %}
+      <p>Login <a href="/login">here!</a></p>
+      <p>Register <a href="/register">here!</a></p>
+    {% endblock %}
+    {% endif %}
 
     <!-- Option 1: Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>

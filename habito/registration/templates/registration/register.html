@@ -2,7 +2,7 @@
 
 {% block title %}Register{% endblock %}
 
-{% block content %}
+{% block not_auth_content %}
     <form method="POST" class="form-group">
         {% csrf_token %}
         {{form}}
