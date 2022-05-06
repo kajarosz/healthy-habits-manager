@@ -8,4 +8,13 @@
     {{form}}
     <button type="submit" class="btn btn-success">Create</button>
 </form>
+<!---
+<form class="form-inline d-flex justify-content-between" method="POST">
+    {% csrf_token %}
+    <div><input type="hidden" name="user-id" value="1">
+        <input class="form-control mr-sm-2" type="search" aria-label="Search"
+            name="category">
+        <button class="btn btn-success my-2 my-sm-0" type="submit">Create</button></div>
+    
+</form>-->
 {% endblock %}

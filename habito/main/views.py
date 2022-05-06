@@ -13,6 +13,7 @@ def create_habit(request, pk):
 	if request.method == 'POST':
 		form = HabitForm(request.POST or None)
 		if form.is_valid():
+			form.user_id = pk
 			form.save()
 			return redirect(reverse('main:home'))
 	else:

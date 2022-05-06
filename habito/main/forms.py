@@ -4,4 +4,4 @@ from .models import Habit
 class HabitForm(forms.ModelForm):
     class Meta:
         model = Habit
-        exclude = ['user']
+        fields = ['user', 'category', 'interval', 'freq', 'remind']
