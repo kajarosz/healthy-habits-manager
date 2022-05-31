@@ -4,6 +4,8 @@ from werkzeug.exceptions import HTTPException
 from flask_login import login_required, current_user
 from main import db
 from .models import Habit, Action
+from datetime import datetime
+
 
 views = Blueprint('views', __name__)
 
@@ -35,16 +37,29 @@ def api_spec():
 def dashboard():
     user = current_user
     habit_objects = user.habits
-    print(habit_objects)
-    habits = []
+    daily_habits = []
+    weekly_habits = []
+    monthly_habits = []
+    current_time = datetime.utcnow()
+    current_time = current_time.replace(hour=0, minute=0, second=0, microsecond=0)
     for habit_object in habit_objects:
         habit = habit_object.json()
-        print(habit)
-        habits.append(habit)
-    print(habits)
+        if habit['recurrence'] == 'DAILY':
+            actions = habit_object.actions
+            daily_actions = list(filter(lambda Action: Action.timestamp > current_time, actions))
+            actions_no = len(daily_actions)
+            habit.update({'completed': actions_no})
+            daily_habits.append(habit)
+        elif habit['recurrence'] == 'WEEKLY':
+            weekly_habits.append(habit)
+        elif habit['recurrence'] == 'MONTHLY':
+            monthly_habits.append(habit)
     response =  ({'user': user.id,
-        'habits': habits})
+        'daily habits': daily_habits,
+        'weekly habits': weekly_habits,
+        'monthly habits': monthly_habits})
     return response
+
 
 # add habit
 @views.route('/add-habit', methods=['POST'])
@@ -54,13 +69,13 @@ def add_habit():
         user = current_user
         habit = request.json
         if not habit['classification']:
-            {'message': 'Habit classification is missing'}
+            return {'message': 'Habit classification is missing'}
         if not habit['recurrence']:
-            {'message': 'Habit recurrence is missing'}
+            return {'message': 'Habit recurrence is missing'}
         if not habit['frequency']:
-            {'message': 'Habit frequency is missing'}
+            return {'message': 'Habit frequency is missing'}
         if not habit['reminder']:
-            {'message': 'Habit reminder boolean is missing'}
+            return {'message': 'Habit reminder boolean is missing'}
         else:
             if habit['reminder'].lower() == 'false':
                 habit['reminder'] = False
@@ -74,3 +89,23 @@ def add_habit():
             message = 'Error occured while adding new habit to database.'
             raise DatabaseQueryException(message)
         return {'message': 'New habbit added!'}
+
+# add action
+@views.route('/add-action', methods=['POST'])
+@login_required
+def add_action():
+    if request.method == 'POST':
+        user = current_user
+        action = request.json
+        if not action['classification']:
+            return {'message': 'Habit info is missing'}
+        habit = Habit.query.filter_by(user=user.id, classification=action['classification']).first()
+        try:
+            new_action = Action(user=user.id, habit=habit.id)
+            db.session.add(new_action)
+            db.session.commit()
+        except:
+            message = 'Error occured while adding new action to database.'
+            raise DatabaseQueryException(message)
+        return {'message': 'New action added!'}
+        

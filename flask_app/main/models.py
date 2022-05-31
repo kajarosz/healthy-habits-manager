@@ -1,6 +1,6 @@
 import enum
 from flask_login import UserMixin
-from sqlalchemy.sql import func
+from datetime import datetime
 from main import db
 
 class Classification(enum.Enum):
@@ -67,7 +67,7 @@ class Action(db.Model):
     id = db.Column(db.Integer, primary_key = True, unique=True, nullable=False)
     user = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     habit = db.Column(db.Integer, db.ForeignKey('habits.id'), nullable=False)
-    timestamp = db.Column(db.DateTime(timezone=True), default=func.now())
+    timestamp = db.Column(db.DateTime(timezone=False), default=datetime.utcnow())
 
     def __str__(self):
         return f'User {self.user} performed habit: {self.habit}.'
