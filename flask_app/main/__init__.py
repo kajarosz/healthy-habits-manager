@@ -11,7 +11,7 @@ def create_app(ENV):
 
     if ENV == 'dev':
         app.debug = False
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:root@localhost/healthy-habits-manager'
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://user:pass@localhost/healthy-habits-manager'
     else:
         app.debug = False
         app.config['SQLALCHEMY_DATABASE_URI'] = ''
