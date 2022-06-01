@@ -28,16 +28,10 @@ def generic_http_error(e):
 def register():
     if request.method == 'POST':
         login_valid, email_valid, password_valid = False, False, False
-        # exctract request body
         try:
-            user = request.json
-        except:
-            message = 'Server could not JSONify the request.'
-            raise RequestException(message)
-        try:
-            login = user['login']
-            email = user['email']
-            password = user['password']
+            login = request.form.get('login')
+            email = request.form.get('email')
+            password = request.form.get('password')
         except:
             message = 'Some keys are missing. Please provide following keys: login, email and password'
             raise RequestException(message)
@@ -87,15 +81,9 @@ def register():
 @auth.route('/login', methods=['POST'])
 def login():
     if request.method == 'POST':
-        # exctract request body
         try:
-            user = request.json
-        except:
-            message = 'Server could not JSONify the request.'
-            raise RequestException(message)
-        try:
-            login = user['login']
-            password = user['password']
+            login = request.form.get('login')
+            password = request.form.get('password')
         except:
             message = 'Some keys are missing. Please provide following keys: login, email and password'
             raise RequestException(message)

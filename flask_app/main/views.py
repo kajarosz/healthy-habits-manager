@@ -88,22 +88,27 @@ def dashboard():
 def add_habit():
     if request.method == 'POST':
         user = current_user
-        habit = request.json
-        if not habit['classification']:
+        if not request.form.get('classification'):
             return {'message': 'Habit classification is missing'}
-        if not habit['recurrence']:
+        else:
+            classification = request.form.get('classification')
+        if not request.form.get('recurrence'):
             return {'message': 'Habit recurrence is missing'}
-        if not habit['frequency']:
+        else:
+            recurrence = request.form.get('recurrence')
+        if not request.form.get('frequency'):
             return {'message': 'Habit frequency is missing'}
-        if not habit['reminder']:
+        else:
+            frequency = request.form.get('frequency')
+        if not request.form.get('reminder'):
             return {'message': 'Habit reminder boolean is missing'}
         else:
-            if habit['reminder'].lower() == 'false':
-                habit['reminder'] = False
-            elif habit['reminder'].lower() == 'true':
-                habit['reminder'] = True
+            if request.form.get('reminder').lower() == 'false':
+                reminder = False
+            elif request.form.get('reminder').lower() == 'true':
+                reminder = True
         try:
-            new_habit = Habit(user=user.id, classification=habit['classification'], recurrence=habit['recurrence'], frequency=habit['frequency'], reminder=habit['reminder'])
+            new_habit = Habit(user=user.id, classification=classification, recurrence=recurrence, frequency=frequency, reminder=reminder)
             db.session.add(new_habit)
             db.session.commit()
         except:
@@ -117,10 +122,11 @@ def add_habit():
 def add_action():
     if request.method == 'POST':
         user = current_user
-        action = request.json
-        if not action['classification']:
+        if not request.form.get('classification'):
             return {'message': 'Habit info is missing'}
-        habit = Habit.query.filter_by(user=user.id, classification=action['classification']).first()
+        else:
+            classification = request.form.get('classification')
+        habit = Habit.query.filter_by(user=user.id, classification=classification).first()
         try:
             new_action = Action(user=user.id, habit=habit.id)
             db.session.add(new_action)
