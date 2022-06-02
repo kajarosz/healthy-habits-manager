@@ -39,7 +39,6 @@ def dashboard():
     response = current_dashboard(user)
     return response
 
-
 # add habit
 @views.route('/habit', methods=['POST', 'DELETE'])
 @login_required
@@ -65,14 +64,24 @@ def habit():
                 reminder = False
             elif request.form.get('reminder').lower() == 'true':
                 reminder = True
-        try:
-            new_habit = Habit(user=user.id, classification=classification, recurrence=recurrence, frequency=frequency, reminder=reminder)
-            db.session.add(new_habit)
+        existing_habit = db.session.query(Habit).filter_by(user=user.id, classification=classification).first()
+        if existing_habit:
+            updates = {'classification': classification,
+            'recurrence': recurrence,
+            'frequency': frequency,
+            'reminder': reminder}
+            db.session.query(Habit).filter(Habit.id == existing_habit.id).update(updates)
             db.session.commit()
-        except:
-            message = 'Error occured while adding new habit to database.'
-            raise DatabaseQueryException(message)
-        return {'message': 'New habbit added!'}
+            return {'message': 'Existing habit has been updated!'}
+        else:
+            try:
+                new_habit = Habit(user=user.id, classification=classification, recurrence=recurrence, frequency=frequency, reminder=reminder)
+                db.session.add(new_habit)
+                db.session.commit()
+            except:
+                message = 'Error occured while adding new habit to database.'
+                raise DatabaseQueryException(message)
+            return {'message': 'New habit added!'}
     elif request.method == 'DELETE':
         user = current_user
         if not request.form.get('classification'):
