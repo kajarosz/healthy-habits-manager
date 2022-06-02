@@ -41,9 +41,9 @@ def dashboard():
 
 
 # add habit
-@views.route('/add-habit', methods=['POST'])
+@views.route('/habit', methods=['POST', 'DELETE'])
 @login_required
-def add_habit():
+def habit():
     if request.method == 'POST':
         user = current_user
         if not request.form.get('classification'):
@@ -73,6 +73,19 @@ def add_habit():
             message = 'Error occured while adding new habit to database.'
             raise DatabaseQueryException(message)
         return {'message': 'New habbit added!'}
+    elif request.method == 'DELETE':
+        user = current_user
+        if not request.form.get('classification'):
+            return {'message': 'Habit info is missing'}
+        else:
+            classification = request.form.get('classification')
+        habit = Habit.query.filter_by(user=user.id, classification=classification).first()
+        actions = habit.actions
+        for action in actions:
+            db.session.delete(action)
+        db.session.delete(habit)
+        db.session.commit()
+        return {'message': 'Habit was deleted.'}
 
 # add action
 @views.route('/action', methods=['POST', 'DELETE'])
